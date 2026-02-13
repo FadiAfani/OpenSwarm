@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package openswarm.api;
+
+option go_package = "openswarm/api/gen";
+
+message Vector {
+    repeated double values = 1;
+}
+
+message Layers {
+    int32 first = 1;
+    int32 last = 2;
+}
+
+message Worker {
+    string id = 1;
+    string gpu_model = 2;
+    int32 vram = 3;
+    bool online_status = 4;
+    Layers layers = 5;
+}
+
+message Coordinator {
+    string id = 1;
+    bool status = 2;
+    string latency = 3;
+    int32 num_workers = 4;
+}
+
+message Consumer {
+    string id = 1;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package openswarm.api
+
+service SessionService {
+    rpc InitializeSession() returns (SessionInitResponse)
+}
+ 
+type SessionInitResponse {}

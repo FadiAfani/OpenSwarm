@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package openswarm.api;
+
+option go_package = "openswarm/api/gen";
+
+import "api/proto/types.proto";
+
+service CoordinatorService {
+    rpc RelayForward(RelayRequest) returns (RelayResponse);
+    rpc GetCoordinatorHealth() returns (GetCoordinatorHealthResponse)
+}
+
+message RelayRequest {
+    Vector vector = 1;
+}
+
+message RelayResponse {}
+
+message GetCoordinatorHealthResponse {
+    bool status = 1;
+    string Latency = 2;
+}
+
