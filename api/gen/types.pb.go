@@ -257,6 +257,7 @@ func (x *Vector) GetShape() []int64 {
 }
 
 // SamplingPlan is coordinator-owned decode policy: logits -> next token id.
+// Maybe we will default to greedy sampling for now (argmax(logits))
 type SamplingPlan struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

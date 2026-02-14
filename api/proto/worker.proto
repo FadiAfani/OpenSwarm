@@ -4,45 +4,11 @@ package openswarm.api;
 
 option go_package = "openswarm/api/gen";
 
-import "api/proto/types.proto";
 
 // WorkerService handles worker-related operations. A worker is a decentralized
 // node in the network that holds sharded layers of an LLM and some experts.
 service WorkerService {
-  // Register a new worker with the swarm.
-  rpc RegisterWorker(RegisterWorkerRequest) returns (Worker);
-  // Remove a worker from the swarm.
-  rpc UnregisterWorker(UnregisterWorkerRequest) returns (UnregisterWorkerResponse);
-  // Get a worker by id.
-  rpc GetWorker(GetWorkerRequest) returns (Worker);
-  // List workers, optionally filtered (e.g. online only).
-  rpc ListWorkers(ListWorkersRequest) returns (ListWorkersResponse);
-  // Heartbeat from a worker to report liveness and update online status.
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
-}
-
-message RegisterWorkerRequest {
-  string id = 1;
-  string gpu_model = 2;
-  int32 vram = 3;
-}
-
-message UnregisterWorkerRequest {
-  string worker_id = 1;
-}
-
-message UnregisterWorkerResponse {}
-
-message GetWorkerRequest {
-  string worker_id = 1;
-}
-
-message ListWorkersRequest {
-  bool online_only = 1;
-}
-
-message ListWorkersResponse {
-  repeated Worker workers = 1;
 }
 
 message HeartbeatRequest {
