@@ -22,6 +22,8 @@ protoc -I . \
   --go-grpc_out=. --go-grpc_opt=module=openswarm \
   "$PROTO_ROOT"/types.proto \
   "$PROTO_ROOT"/worker.proto \
-  "$PROTO_ROOT"/coordinator.proto
+  "$PROTO_ROOT"/coordinator.proto \
+  "$PROTO_ROOT"/session.proto \
+  "$PROTO_ROOT"/consumer.proto
 
 echo "Generated Go code in $GEN_DIR/"

@@ -4,8 +4,53 @@ package openswarm.api;
 
 option go_package = "openswarm/api/gen";
 
+// DType encodes the scalar type of tensor payload bytes.
+enum DType {
+    DTYPE_UNSPECIFIED = 0;
+    DTYPE_FP16 = 1;
+    DTYPE_BF16 = 2;
+    DTYPE_FP32 = 3;
+    DTYPE_INT8 = 4;
+    DTYPE_INT32 = 5;
+    DTYPE_INT64 = 6;
+    DTYPE_UINT8 = 7;
+}
+
+// Vector is the transport payload for stage activations/logits.
+// data contains a flattened row-major tensor encoded in `dtype`.
+// shape defines tensor dimensions (e.g. [B, T, D] for activations).
 message Vector {
-    repeated double values = 1;
+    bytes data = 1;
+    DType dtype = 2;
+    repeated int64 shape = 3;
+}
+
+enum SamplingStrategy {
+    SAMPLING_STRATEGY_UNSPECIFIED = 0;
+    SAMPLING_STRATEGY_GREEDY = 1;
+    SAMPLING_STRATEGY_TOP_P = 2;
+    SAMPLING_STRATEGY_TOP_K = 3;
+    SAMPLING_STRATEGY_TOP_P_TOP_K = 4;
+}
+
+// SamplingPlan is coordinator-owned decode policy: logits -> next token id.
+// Maybe we will default to greedy sampling for now (argmax(logits))
+message SamplingPlan {
+    SamplingStrategy strategy = 1;
+
+    float temperature = 2;
+    float top_p = 3;
+    int32 top_k = 4;
+    float repetition_penalty = 5;
+
+    int32 min_new_tokens = 6;
+    int32 max_new_tokens = 7;
+
+    uint64 seed = 8;
+    bool deterministic = 9;
+
+    repeated int32 stop_token_ids = 10;
+    repeated string stop_strings = 11;
 }
 
 message Layers {
@@ -30,4 +75,25 @@ message Coordinator {
 
 message Consumer {
     string id = 1;
+}
+
+enum KvCacheState {
+    COLD = 0;
+    WARM = 1;
+    ACTIVE = 2;
+    EVICTED = 3;
+}
+
+message KvCacheMetadata {
+    string worker_id = 1;
+    string cache_key = 2;
+    KvCacheState cache_state = 3;
+}
+
+message Session {
+    string id = 1;
+    string customer_id = 2;
+    string pipeline_id = 3;
+    KvCacheMetadata kv_md = 4;
+
 }

@@ -7,8 +7,19 @@ option go_package = "openswarm/api/gen";
 import "api/proto/types.proto";
 
 service CoordinatorService {
+    rpc InitializeTask(InitTaskRequest) returns (InitTaskResponse);
     rpc RelayForward(RelayRequest) returns (RelayResponse);
-    rpc GetCoordinatorHealth() returns (GetCoordinatorHealthResponse)
+    rpc GetCoordinatorHealth(GetCoordinatorHealthRequest) returns (CoordinatorHealthResponse);
+}
+
+message InitTaskRequest {
+    string session_id = 1;
+    string prompt = 2;
+    SamplingPlan sampling_plan = 3;
+}
+
+message InitTaskResponse{
+    Vector vector = 1;
 }
 
 message RelayRequest {
@@ -17,8 +28,9 @@ message RelayRequest {
 
 message RelayResponse {}
 
-message GetCoordinatorHealthResponse {
-    bool status = 1;
-    string Latency = 2;
-}
+message GetCoordinatorHealthRequest {}
 
+message CoordinatorHealthResponse {
+    bool status = 1;
+    string latency = 2;
+}

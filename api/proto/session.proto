@@ -1,9 +1,35 @@
 syntax = "proto3";
 
-package openswarm.api
+package openswarm.api;
 
+option go_package = "openswarm/api/gen";
+
+// Sessions hold Consumer-Network info.
 service SessionService {
-    rpc InitializeSession() returns (SessionInitResponse)
+    rpc InitializeSession(InitSessionRequest) returns (InitSessionResponse);
+    rpc DismantleSession(DismantleSessionRequest) returns (DismantleSessionResponse);
+    rpc GetSession(SessionRequest) returns (SessionResponse);
 }
- 
-type SessionInitResponse {}
+
+message InitSessionRequest {
+    string consumer_id = 1;
+    string coordinator_id = 2;
+}
+
+message InitSessionResponse {
+    string session_id = 1;
+}
+
+message DismantleSessionRequest {
+    string id = 1;
+}
+
+message DismantleSessionResponse {}
+
+message SessionRequest {
+    string id = 1;
+}
+
+message SessionResponse {
+    string id = 1;
+}

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package openswarm.api;
+
+option go_package = "openswarm/api/gen";
+
+// ConsumerService handles consumer-facing operations (e.g. inference requests).
+service ConsumerService {
+    rpc SendPrompt(SendPromptRequest) returns (SendPromptResponse);
+}
+
+message SendPromptRequest {
+    string session_id = 1;
+    string prompt = 2;
+}
+
+message SendPromptResponse {
+    string request_id = 1;
+}

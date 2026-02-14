@@ -19,14 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CoordinatorService_RelayToExpert_FullMethodName = "/openswarm.api.CoordinatorService/RelayToExpert"
+	CoordinatorService_InitializeTask_FullMethodName       = "/openswarm.api.CoordinatorService/InitializeTask"
+	CoordinatorService_RelayForward_FullMethodName         = "/openswarm.api.CoordinatorService/RelayForward"
+	CoordinatorService_GetCoordinatorHealth_FullMethodName = "/openswarm.api.CoordinatorService/GetCoordinatorHealth"
 )
 
 // CoordinatorServiceClient is the client API for CoordinatorService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CoordinatorServiceClient interface {
-	RelayToExpert(ctx context.Context, in *RelayRequest, opts ...grpc.CallOption) (*RelayResponse, error)
+	InitializeTask(ctx context.Context, in *InitTaskRequest, opts ...grpc.CallOption) (*InitTaskResponse, error)
+	RelayForward(ctx context.Context, in *RelayRequest, opts ...grpc.CallOption) (*RelayResponse, error)
+	GetCoordinatorHealth(ctx context.Context, in *GetCoordinatorHealthRequest, opts ...grpc.CallOption) (*CoordinatorHealthResponse, error)
 }
 
 type coordinatorServiceClient struct {
@@ -37,10 +41,30 @@ func NewCoordinatorServiceClient(cc grpc.ClientConnInterface) CoordinatorService
 	return &coordinatorServiceClient{cc}
 }
 
-func (c *coordinatorServiceClient) RelayToExpert(ctx context.Context, in *RelayRequest, opts ...grpc.CallOption) (*RelayResponse, error) {
+func (c *coordinatorServiceClient) InitializeTask(ctx context.Context, in *InitTaskRequest, opts ...grpc.CallOption) (*InitTaskResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InitTaskResponse)
+	err := c.cc.Invoke(ctx, CoordinatorService_InitializeTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coordinatorServiceClient) RelayForward(ctx context.Context, in *RelayRequest, opts ...grpc.CallOption) (*RelayResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RelayResponse)
-	err := c.cc.Invoke(ctx, CoordinatorService_RelayToExpert_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CoordinatorService_RelayForward_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coordinatorServiceClient) GetCoordinatorHealth(ctx context.Context, in *GetCoordinatorHealthRequest, opts ...grpc.CallOption) (*CoordinatorHealthResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CoordinatorHealthResponse)
+	err := c.cc.Invoke(ctx, CoordinatorService_GetCoordinatorHealth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +75,9 @@ func (c *coordinatorServiceClient) RelayToExpert(ctx context.Context, in *RelayR
 // All implementations must embed UnimplementedCoordinatorServiceServer
 // for forward compatibility.
 type CoordinatorServiceServer interface {
-	RelayToExpert(context.Context, *RelayRequest) (*RelayResponse, error)
+	InitializeTask(context.Context, *InitTaskRequest) (*InitTaskResponse, error)
+	RelayForward(context.Context, *RelayRequest) (*RelayResponse, error)
+	GetCoordinatorHealth(context.Context, *GetCoordinatorHealthRequest) (*CoordinatorHealthResponse, error)
 	mustEmbedUnimplementedCoordinatorServiceServer()
 }
 
@@ -62,8 +88,14 @@ type CoordinatorServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCoordinatorServiceServer struct{}
 
-func (UnimplementedCoordinatorServiceServer) RelayToExpert(context.Context, *RelayRequest) (*RelayResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RelayToExpert not implemented")
+func (UnimplementedCoordinatorServiceServer) InitializeTask(context.Context, *InitTaskRequest) (*InitTaskResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InitializeTask not implemented")
+}
+func (UnimplementedCoordinatorServiceServer) RelayForward(context.Context, *RelayRequest) (*RelayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RelayForward not implemented")
+}
+func (UnimplementedCoordinatorServiceServer) GetCoordinatorHealth(context.Context, *GetCoordinatorHealthRequest) (*CoordinatorHealthResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCoordinatorHealth not implemented")
 }
 func (UnimplementedCoordinatorServiceServer) mustEmbedUnimplementedCoordinatorServiceServer() {}
 func (UnimplementedCoordinatorServiceServer) testEmbeddedByValue()                            {}
@@ -86,20 +118,56 @@ func RegisterCoordinatorServiceServer(s grpc.ServiceRegistrar, srv CoordinatorSe
 	s.RegisterService(&CoordinatorService_ServiceDesc, srv)
 }
 
-func _CoordinatorService_RelayToExpert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CoordinatorService_InitializeTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InitTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoordinatorServiceServer).InitializeTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoordinatorService_InitializeTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoordinatorServiceServer).InitializeTask(ctx, req.(*InitTaskRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoordinatorService_RelayForward_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RelayRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CoordinatorServiceServer).RelayToExpert(ctx, in)
+		return srv.(CoordinatorServiceServer).RelayForward(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CoordinatorService_RelayToExpert_FullMethodName,
+		FullMethod: CoordinatorService_RelayForward_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoordinatorServiceServer).RelayToExpert(ctx, req.(*RelayRequest))
+		return srv.(CoordinatorServiceServer).RelayForward(ctx, req.(*RelayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoordinatorService_GetCoordinatorHealth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCoordinatorHealthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoordinatorServiceServer).GetCoordinatorHealth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoordinatorService_GetCoordinatorHealth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoordinatorServiceServer).GetCoordinatorHealth(ctx, req.(*GetCoordinatorHealthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +180,16 @@ var CoordinatorService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CoordinatorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "RelayToExpert",
-			Handler:    _CoordinatorService_RelayToExpert_Handler,
+			MethodName: "InitializeTask",
+			Handler:    _CoordinatorService_InitializeTask_Handler,
+		},
+		{
+			MethodName: "RelayForward",
+			Handler:    _CoordinatorService_RelayForward_Handler,
+		},
+		{
+			MethodName: "GetCoordinatorHealth",
+			Handler:    _CoordinatorService_GetCoordinatorHealth_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
