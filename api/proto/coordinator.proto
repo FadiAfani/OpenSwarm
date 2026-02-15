@@ -8,6 +8,8 @@ option go_package = "openswarm/api/gen";
 import "api/proto/types.proto";
 
 service CoordinatorService {
+    rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+    rpc DestroySession(DestroySessionRequest) returns (DestroySessionResponse);
     rpc InitializeTask(InitTaskRequest) returns (InitTaskResponse);
     rpc RelayForward(RelayRequest) returns (RelayResponse);
     rpc GetCoordinatorHealth(GetCoordinatorHealthRequest) returns (CoordinatorHealthResponse);
@@ -15,6 +17,28 @@ service CoordinatorService {
     rpc UnregisterWorker(UnregisterWorkerRequest) returns (UnregisterWorkerResponse);
     rpc GetWorker(GetWorkerRequest) returns (GetWorkerResponse);
     rpc ListWorkers(ListWorkersRequest) returns (ListWorkersResponse);
+}
+
+message Pipeline {
+    repeated string worker_ids = 1;
+}
+
+message CreateSessionRequest {
+    string consumer_id = 1;
+    string model_id = 2;
+    Pipeline pipeline = 3;
+}
+
+message CreateSessionResponse {
+    string session_id = 1;
+}
+
+message DestroySessionRequest {
+    string session_id = 1;
+}
+
+message DestroySessionResponse {
+    bool destroyed = 1;
 }
 
 message InitTaskRequest {

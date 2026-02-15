@@ -2,6 +2,8 @@ package coordinator
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Task struct {
@@ -30,4 +32,16 @@ type SamplingPlan struct {
 	MaxNewTokens      int32
 	Seed              int32
 	Deterministic     bool
+}
+
+type Pipeline struct {
+	Workers []uuid.UUID
+}
+
+type Session struct {
+	ID         uuid.UUID
+	ConsumerID string
+	ModelID    string
+	Pipeline   Pipeline
+	CreatedAt  time.Time
 }

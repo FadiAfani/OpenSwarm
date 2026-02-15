@@ -7,6 +7,15 @@ option go_package = "openswarm/api/gen";
 // ConsumerService handles consumer-facing operations (e.g. inference requests).
 service ConsumerService {
     rpc SendPrompt(SendPromptRequest) returns (SendPromptResponse);
+    rpc CancelRequest(CancelRequestRequest) returns (CancelRequestResponse);
+}
+
+message CancelRequestRequest {
+    string request_id = 1;
+}
+
+message CancelRequestResponse {
+    bool canceled = 1;
 }
 
 message SendPromptRequest {
