@@ -9,6 +9,7 @@ option go_package = "openswarm/api/gen";
 // node in the network that holds sharded layers of an LLM and some experts.
 service WorkerService {
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc ConnectToCoordinator(ConnectToCoordinatorRequest) returns (ConnectToCoordinatorResponse);
 }
 
 message HeartbeatRequest {
@@ -16,5 +17,13 @@ message HeartbeatRequest {
 }
 
 message HeartbeatResponse {
+  bool accepted = 1;
+}
+
+message ConnectToCoordinatorRequest {
+  string addr = 1;
+}
+
+message ConnectToCoordinatorResponse {
   bool accepted = 1;
 }

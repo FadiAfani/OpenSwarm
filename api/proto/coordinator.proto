@@ -53,7 +53,7 @@ message InitTaskResponse{
 
 message RelayRequest {
     Vector vector = 1;
-    string workder_id = 2;
+    string worker_id = 2;
 
 }
 

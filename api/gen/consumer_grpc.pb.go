@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ConsumerService_SendPrompt_FullMethodName = "/openswarm.api.ConsumerService/SendPrompt"
+	ConsumerService_SendPrompt_FullMethodName    = "/openswarm.api.ConsumerService/SendPrompt"
+	ConsumerService_CancelRequest_FullMethodName = "/openswarm.api.ConsumerService/CancelRequest"
 )
 
 // ConsumerServiceClient is the client API for ConsumerService service.
@@ -29,6 +30,7 @@ const (
 // ConsumerService handles consumer-facing operations (e.g. inference requests).
 type ConsumerServiceClient interface {
 	SendPrompt(ctx context.Context, in *SendPromptRequest, opts ...grpc.CallOption) (*SendPromptResponse, error)
+	CancelRequest(ctx context.Context, in *CancelRequestRequest, opts ...grpc.CallOption) (*CancelRequestResponse, error)
 }
 
 type consumerServiceClient struct {
@@ -49,6 +51,16 @@ func (c *consumerServiceClient) SendPrompt(ctx context.Context, in *SendPromptRe
 	return out, nil
 }
 
+func (c *consumerServiceClient) CancelRequest(ctx context.Context, in *CancelRequestRequest, opts ...grpc.CallOption) (*CancelRequestResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CancelRequestResponse)
+	err := c.cc.Invoke(ctx, ConsumerService_CancelRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConsumerServiceServer is the server API for ConsumerService service.
 // All implementations must embed UnimplementedConsumerServiceServer
 // for forward compatibility.
@@ -56,6 +68,7 @@ func (c *consumerServiceClient) SendPrompt(ctx context.Context, in *SendPromptRe
 // ConsumerService handles consumer-facing operations (e.g. inference requests).
 type ConsumerServiceServer interface {
 	SendPrompt(context.Context, *SendPromptRequest) (*SendPromptResponse, error)
+	CancelRequest(context.Context, *CancelRequestRequest) (*CancelRequestResponse, error)
 	mustEmbedUnimplementedConsumerServiceServer()
 }
 
@@ -68,6 +81,9 @@ type UnimplementedConsumerServiceServer struct{}
 
 func (UnimplementedConsumerServiceServer) SendPrompt(context.Context, *SendPromptRequest) (*SendPromptResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendPrompt not implemented")
+}
+func (UnimplementedConsumerServiceServer) CancelRequest(context.Context, *CancelRequestRequest) (*CancelRequestResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelRequest not implemented")
 }
 func (UnimplementedConsumerServiceServer) mustEmbedUnimplementedConsumerServiceServer() {}
 func (UnimplementedConsumerServiceServer) testEmbeddedByValue()                         {}
@@ -108,6 +124,24 @@ func _ConsumerService_SendPrompt_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConsumerService_CancelRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelRequestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConsumerServiceServer).CancelRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConsumerService_CancelRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConsumerServiceServer).CancelRequest(ctx, req.(*CancelRequestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConsumerService_ServiceDesc is the grpc.ServiceDesc for ConsumerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -118,6 +152,10 @@ var ConsumerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendPrompt",
 			Handler:    _ConsumerService_SendPrompt_Handler,
+		},
+		{
+			MethodName: "CancelRequest",
+			Handler:    _ConsumerService_CancelRequest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -19,6 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	CoordinatorService_CreateSession_FullMethodName        = "/openswarm.api.CoordinatorService/CreateSession"
+	CoordinatorService_DestroySession_FullMethodName       = "/openswarm.api.CoordinatorService/DestroySession"
 	CoordinatorService_InitializeTask_FullMethodName       = "/openswarm.api.CoordinatorService/InitializeTask"
 	CoordinatorService_RelayForward_FullMethodName         = "/openswarm.api.CoordinatorService/RelayForward"
 	CoordinatorService_GetCoordinatorHealth_FullMethodName = "/openswarm.api.CoordinatorService/GetCoordinatorHealth"
@@ -32,6 +34,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CoordinatorServiceClient interface {
+	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error)
+	DestroySession(ctx context.Context, in *DestroySessionRequest, opts ...grpc.CallOption) (*DestroySessionResponse, error)
 	InitializeTask(ctx context.Context, in *InitTaskRequest, opts ...grpc.CallOption) (*InitTaskResponse, error)
 	RelayForward(ctx context.Context, in *RelayRequest, opts ...grpc.CallOption) (*RelayResponse, error)
 	GetCoordinatorHealth(ctx context.Context, in *GetCoordinatorHealthRequest, opts ...grpc.CallOption) (*CoordinatorHealthResponse, error)
@@ -47,6 +51,26 @@ type coordinatorServiceClient struct {
 
 func NewCoordinatorServiceClient(cc grpc.ClientConnInterface) CoordinatorServiceClient {
 	return &coordinatorServiceClient{cc}
+}
+
+func (c *coordinatorServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateSessionResponse)
+	err := c.cc.Invoke(ctx, CoordinatorService_CreateSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coordinatorServiceClient) DestroySession(ctx context.Context, in *DestroySessionRequest, opts ...grpc.CallOption) (*DestroySessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DestroySessionResponse)
+	err := c.cc.Invoke(ctx, CoordinatorService_DestroySession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *coordinatorServiceClient) InitializeTask(ctx context.Context, in *InitTaskRequest, opts ...grpc.CallOption) (*InitTaskResponse, error) {
@@ -123,6 +147,8 @@ func (c *coordinatorServiceClient) ListWorkers(ctx context.Context, in *ListWork
 // All implementations must embed UnimplementedCoordinatorServiceServer
 // for forward compatibility.
 type CoordinatorServiceServer interface {
+	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
+	DestroySession(context.Context, *DestroySessionRequest) (*DestroySessionResponse, error)
 	InitializeTask(context.Context, *InitTaskRequest) (*InitTaskResponse, error)
 	RelayForward(context.Context, *RelayRequest) (*RelayResponse, error)
 	GetCoordinatorHealth(context.Context, *GetCoordinatorHealthRequest) (*CoordinatorHealthResponse, error)
@@ -140,6 +166,12 @@ type CoordinatorServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCoordinatorServiceServer struct{}
 
+func (UnimplementedCoordinatorServiceServer) CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateSession not implemented")
+}
+func (UnimplementedCoordinatorServiceServer) DestroySession(context.Context, *DestroySessionRequest) (*DestroySessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DestroySession not implemented")
+}
 func (UnimplementedCoordinatorServiceServer) InitializeTask(context.Context, *InitTaskRequest) (*InitTaskResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method InitializeTask not implemented")
 }
@@ -180,6 +212,42 @@ func RegisterCoordinatorServiceServer(s grpc.ServiceRegistrar, srv CoordinatorSe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CoordinatorService_ServiceDesc, srv)
+}
+
+func _CoordinatorService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoordinatorServiceServer).CreateSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoordinatorService_CreateSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoordinatorServiceServer).CreateSession(ctx, req.(*CreateSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoordinatorService_DestroySession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DestroySessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoordinatorServiceServer).DestroySession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoordinatorService_DestroySession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoordinatorServiceServer).DestroySession(ctx, req.(*DestroySessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CoordinatorService_InitializeTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -315,6 +383,14 @@ var CoordinatorService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "openswarm.api.CoordinatorService",
 	HandlerType: (*CoordinatorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateSession",
+			Handler:    _CoordinatorService_CreateSession_Handler,
+		},
+		{
+			MethodName: "DestroySession",
+			Handler:    _CoordinatorService_DestroySession_Handler,
+		},
 		{
 			MethodName: "InitializeTask",
 			Handler:    _CoordinatorService_InitializeTask_Handler,

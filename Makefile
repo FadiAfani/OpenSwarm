@@ -1,4 +1,7 @@
-.PHONY: deps proto gen
+.PHONY: deps proto gen build run coordinator
+
+COORDINATOR_CMD := ./cmd/coordinator
+COORDINATOR_BIN := ./bin/coordinator
 
 # Install protoc Go plugins (ensure $GOPATH/bin or $GOBIN is in PATH)
 deps:
@@ -10,3 +13,13 @@ deps:
 proto: gen
 gen:
 	./scripts/genproto.sh
+
+# Build the coordinator binary.
+build: coordinator
+
+coordinator:
+	go build -o $(COORDINATOR_BIN) $(COORDINATOR_CMD)
+
+# Run the coordinator service directly.
+run:
+	go run $(COORDINATOR_CMD)

@@ -87,10 +87,13 @@ func (s *CoordinatorGRPCServer) InitializeTask(ctx context.Context, req *api.Ini
 }
 
 func (s *CoordinatorGRPCServer) RelayForward(ctx context.Context, req *api.RelayRequest) (*api.RelayResponse, error) {
-	_ = ctx
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "missing request")
 	}
+	if err := ValidateRelayRequest(req); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
 	return &api.RelayResponse{}, nil
 }
 
@@ -104,7 +107,7 @@ func (s *CoordinatorGRPCServer) RegisterWorker(ctx context.Context, req *api.Reg
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "missing request")
 	}
-	if err := validateRegisterWorkerRequest(req); err != nil {
+	if err := ValidateRegisterWorkerRequest(req); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	s.mu.Lock()
@@ -123,7 +126,7 @@ func (s *CoordinatorGRPCServer) UnregisterWorker(ctx context.Context, req *api.U
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "missing request")
 	}
-	if err := validateUnregisterWorkerRequest(req); err != nil {
+	if err := ValidateUnregisterWorkerRequest(req); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	s.mu.Lock()
@@ -136,7 +139,7 @@ func (s *CoordinatorGRPCServer) ListWorkers(ctx context.Context, req *api.ListWo
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "missing request")
 	}
-	if err := validateListWorkersRequest(req); err != nil {
+	if err := ValidateListWorkersRequest(req); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	s.mu.RLock()
