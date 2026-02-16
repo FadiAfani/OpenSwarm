@@ -6,7 +6,8 @@ import (
 
 	api "openswarm/api/gen"
 
-	"github.com/google/uuid"
+	"openswarm/internal/models"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -14,23 +15,22 @@ import (
 type Status struct{}
 
 type Record struct {
-	ID            uuid.UUID
-	GpuModel      string
-	Vram          uint
-	CoordinatorID string
-	Status        Status
+	ID       models.UUID
+	GpuModel string
+	Vram     uint
+	Status   Status
 }
 
 type GRPCServer struct {
 	api.UnimplementedWorkerServiceServer
 	mu      sync.RWMutex
-	workers map[string]*Record
+	workers map[models.UUID]*Record
 }
 
 func NewGRPCServer() *GRPCServer {
 	return &GRPCServer{
 		mu:      sync.RWMutex{},
-		workers: make(map[string]*Record),
+		workers: make(map[models.UUID]*Record),
 	}
 }
 
@@ -43,7 +43,7 @@ func (s *GRPCServer) RegisterWorker(ctx context.Context, req *api.RegisterWorker
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	id := uuid.New()
+	id := models.NewUUID()
 
 	s.mu.Lock()
 	worker := Record{
@@ -52,7 +52,7 @@ func (s *GRPCServer) RegisterWorker(ctx context.Context, req *api.RegisterWorker
 		Vram:     uint(req.Vram),
 		Status:   Status{},
 	}
-	s.workers[req.WorkerId] = &worker
+	s.workers[id] = &worker
 	s.mu.Unlock()
 
 	return &api.RegisterWorkerResponse{Accepted: true}, nil
@@ -67,8 +67,13 @@ func (s *GRPCServer) UnregisterWorker(ctx context.Context, req *api.UnregisterWo
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	id, err := models.Parse(req.WorkerId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "worker_id is not a valid UUID")
+	}
+
 	s.mu.Lock()
-	delete(s.workers, req.WorkerId)
+	delete(s.workers, id)
 	s.mu.Unlock()
 
 	return &api.UnregisterWorkerResponse{}, nil
@@ -83,19 +88,19 @@ func (s *GRPCServer) GetWorker(ctx context.Context, req *api.GetWorkerRequest) (
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	id := models.UUID(req.WorkerId)
 	s.mu.RLock()
-	worker, ok := s.workers[req.WorkerId]
+	worker, ok := s.workers[id]
 	s.mu.RUnlock()
 	if !ok {
 		return &api.GetWorkerResponse{Found: false}, nil
 	}
 
 	return &api.GetWorkerResponse{
-		Found:         true,
-		WorkerId:      worker.ID.String(),
-		GpuModel:      worker.GpuModel,
-		Vram:          int32(worker.Vram),
-		CoordinatorId: worker.CoordinatorID,
+		Found:    true,
+		WorkerId: id.String(),
+		GpuModel: worker.GpuModel,
+		Vram:     int32(worker.Vram),
 	}, nil
 }
 
