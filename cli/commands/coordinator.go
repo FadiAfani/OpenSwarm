@@ -7,6 +7,8 @@ import (
 
 	pb "openswarm/api/gen"
 	co "openswarm/internal/coordinator"
+	se "openswarm/internal/session"
+	wk "openswarm/internal/worker/agent"
 
 	"google.golang.org/grpc"
 )
@@ -39,6 +41,8 @@ func runCoordinatorStart(args []string) error {
 
 	server := grpc.NewServer()
 	pb.RegisterCoordinatorServiceServer(server, co.NewCoordinatorGRPCServer())
+	pb.RegisterWorkerServiceServer(server, wk.NewGRPCServer())
+	pb.RegisterSessionServiceServer(server, se.NewGRPCServer())
 
 	fmt.Printf("coordinator listening on %s\n", *addr)
 	return server.Serve(lis)

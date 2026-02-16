@@ -2,14 +2,45 @@ syntax = "proto3";
 
 package openswarm.api;
 
-option go_package = "openswarm/api/gen";
+import "api/proto/types.proto";
 
+option go_package = "openswarm/api/gen";
 
 // WorkerService handles worker-related operations. A worker is a decentralized
 // node in the network that holds sharded layers of an LLM and some experts.
 service WorkerService {
+  rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
+  rpc UnregisterWorker(UnregisterWorkerRequest) returns (UnregisterWorkerResponse);
+  rpc GetWorker(GetWorkerRequest) returns (GetWorkerResponse);
+  rpc ListWorkers(ListWorkersRequest) returns (ListWorkersResponse);
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
-  rpc ConnectToCoordinator(ConnectToCoordinatorRequest) returns (ConnectToCoordinatorResponse);
+}
+
+message RegisterWorkerRequest {
+  string gpu_model = 1;
+  int32 vram = 2;
+}
+
+message RegisterWorkerResponse {
+  bool accepted = 1;
+}
+
+message UnregisterWorkerRequest {
+  string worker_id = 1;
+}
+
+message UnregisterWorkerResponse {}
+
+message GetWorkerRequest {
+  string worker_id = 1;
+}
+
+message GetWorkerResponse {
+  bool found = 1;
+  string worker_id = 2;
+  string gpu_model = 3;
+  int32 vram = 4;
+  string coordinator_id = 5;
 }
 
 message HeartbeatRequest {
@@ -18,6 +49,14 @@ message HeartbeatRequest {
 
 message HeartbeatResponse {
   bool accepted = 1;
+}
+
+message ListWorkersRequest {
+  bool online_only = 1;
+}
+
+message ListWorkersResponse {
+  repeated Worker workers = 1;
 }
 
 message ConnectToCoordinatorRequest {

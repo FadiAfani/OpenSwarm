@@ -19,7 +19,7 @@ func main() {
 
 	pb.RegisterWorkerServiceServer(
 		grpc_server,
-		worker.NewGRPCWorkerServer(),
+		worker.NewGRPCServer(),
 	)
 
 	grpc_server.Serve(lis)

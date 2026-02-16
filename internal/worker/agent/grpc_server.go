@@ -2,26 +2,138 @@ package agent
 
 import (
 	"context"
-	api "openswarm/api/gen"
 	"sync"
 
+	api "openswarm/api/gen"
+
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type GRPCWorkerServer struct {
-	api.UnimplementedWorkerServiceServer
+type Status struct{}
 
-	mu sync.RWMutex
-	co api.CoordinatorServiceClient
+type Record struct {
+	ID            uuid.UUID
+	GpuModel      string
+	Vram          uint
+	CoordinatorID string
+	Status        Status
 }
 
-func NewGRPCWorkerServer() *GRPCWorkerServer {
-	return &GRPCWorkerServer{
-		mu: sync.RWMutex{},
+type GRPCServer struct {
+	api.UnimplementedWorkerServiceServer
+	mu      sync.RWMutex
+	workers map[string]*Record
+}
+
+func NewGRPCServer() *GRPCServer {
+	return &GRPCServer{
+		mu:      sync.RWMutex{},
+		workers: make(map[string]*Record),
 	}
 }
 
-func (s *GRPCWorkerServer) ConnectToCoordinator(ctx context.Context, req *api.ConnectToCoordinatorRequest) (*api.ConnectToCoordinatorResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "Unimplemented")
+func (s *GRPCServer) RegisterWorker(ctx context.Context, req *api.RegisterWorkerRequest) (*api.RegisterWorkerResponse, error) {
+	_ = ctx
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "missing request")
+	}
+	if err := ValidateRegisterWorkerRequest(req); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	id := uuid.New()
+
+	s.mu.Lock()
+	worker := Record{
+		ID:       id,
+		GpuModel: req.GpuModel,
+		Vram:     uint(req.Vram),
+		Status:   Status{},
+	}
+	s.workers[req.WorkerId] = &worker
+	s.mu.Unlock()
+
+	return &api.RegisterWorkerResponse{Accepted: true}, nil
+}
+
+func (s *GRPCServer) UnregisterWorker(ctx context.Context, req *api.UnregisterWorkerRequest) (*api.UnregisterWorkerResponse, error) {
+	_ = ctx
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "missing request")
+	}
+	if err := ValidateUnregisterWorkerRequest(req); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	s.mu.Lock()
+	delete(s.workers, req.WorkerId)
+	s.mu.Unlock()
+
+	return &api.UnregisterWorkerResponse{}, nil
+}
+
+func (s *GRPCServer) GetWorker(ctx context.Context, req *api.GetWorkerRequest) (*api.GetWorkerResponse, error) {
+	_ = ctx
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "missing request")
+	}
+	if err := ValidateGetWorkerRequest(req); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	s.mu.RLock()
+	worker, ok := s.workers[req.WorkerId]
+	s.mu.RUnlock()
+	if !ok {
+		return &api.GetWorkerResponse{Found: false}, nil
+	}
+
+	return &api.GetWorkerResponse{
+		Found:         true,
+		WorkerId:      worker.ID.String(),
+		GpuModel:      worker.GpuModel,
+		Vram:          int32(worker.Vram),
+		CoordinatorId: worker.CoordinatorID,
+	}, nil
+}
+
+func (s *GRPCServer) ListWorkers(ctx context.Context, req *api.ListWorkersRequest) (*api.ListWorkersResponse, error) {
+	_ = ctx
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "missing request")
+	}
+	if err := ValidateListWorkersRequest(req); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	s.mu.RLock()
+	workers := make([]*api.Worker, 0, len(s.workers))
+	for _, worker := range s.workers {
+		workers = append(workers, &api.Worker{
+			Id:       worker.ID.String(),
+			GpuModel: worker.GpuModel,
+			Vram:     int32(worker.Vram),
+		})
+	}
+	s.mu.RUnlock()
+
+	return &api.ListWorkersResponse{Workers: workers}, nil
+}
+
+func (s *GRPCServer) Heartbeat(ctx context.Context, req *api.HeartbeatRequest) (*api.HeartbeatResponse, error) {
+	_ = ctx
+	if req == nil || req.WorkerId == "" {
+		return nil, status.Error(codes.InvalidArgument, "worker_id is required")
+	}
+	return &api.HeartbeatResponse{Accepted: true}, nil
+}
+
+func (s *GRPCServer) ConnectToCoordinator(ctx context.Context, req *api.ConnectToCoordinatorRequest) (*api.ConnectToCoordinatorResponse, error) {
+	_ = ctx
+	if req == nil || req.Addr == "" {
+		return nil, status.Error(codes.InvalidArgument, "addr is required")
+	}
+	return &api.ConnectToCoordinatorResponse{Accepted: true}, nil
 }

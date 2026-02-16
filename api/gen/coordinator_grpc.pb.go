@@ -19,30 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CoordinatorService_CreateSession_FullMethodName        = "/openswarm.api.CoordinatorService/CreateSession"
-	CoordinatorService_DestroySession_FullMethodName       = "/openswarm.api.CoordinatorService/DestroySession"
 	CoordinatorService_InitializeTask_FullMethodName       = "/openswarm.api.CoordinatorService/InitializeTask"
 	CoordinatorService_RelayForward_FullMethodName         = "/openswarm.api.CoordinatorService/RelayForward"
 	CoordinatorService_GetCoordinatorHealth_FullMethodName = "/openswarm.api.CoordinatorService/GetCoordinatorHealth"
-	CoordinatorService_RegisterWorker_FullMethodName       = "/openswarm.api.CoordinatorService/RegisterWorker"
-	CoordinatorService_UnregisterWorker_FullMethodName     = "/openswarm.api.CoordinatorService/UnregisterWorker"
-	CoordinatorService_GetWorker_FullMethodName            = "/openswarm.api.CoordinatorService/GetWorker"
-	CoordinatorService_ListWorkers_FullMethodName          = "/openswarm.api.CoordinatorService/ListWorkers"
 )
 
 // CoordinatorServiceClient is the client API for CoordinatorService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CoordinatorServiceClient interface {
-	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error)
-	DestroySession(ctx context.Context, in *DestroySessionRequest, opts ...grpc.CallOption) (*DestroySessionResponse, error)
 	InitializeTask(ctx context.Context, in *InitTaskRequest, opts ...grpc.CallOption) (*InitTaskResponse, error)
 	RelayForward(ctx context.Context, in *RelayRequest, opts ...grpc.CallOption) (*RelayResponse, error)
 	GetCoordinatorHealth(ctx context.Context, in *GetCoordinatorHealthRequest, opts ...grpc.CallOption) (*CoordinatorHealthResponse, error)
-	RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error)
-	UnregisterWorker(ctx context.Context, in *UnregisterWorkerRequest, opts ...grpc.CallOption) (*UnregisterWorkerResponse, error)
-	GetWorker(ctx context.Context, in *GetWorkerRequest, opts ...grpc.CallOption) (*GetWorkerResponse, error)
-	ListWorkers(ctx context.Context, in *ListWorkersRequest, opts ...grpc.CallOption) (*ListWorkersResponse, error)
 }
 
 type coordinatorServiceClient struct {
@@ -51,26 +39,6 @@ type coordinatorServiceClient struct {
 
 func NewCoordinatorServiceClient(cc grpc.ClientConnInterface) CoordinatorServiceClient {
 	return &coordinatorServiceClient{cc}
-}
-
-func (c *coordinatorServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateSessionResponse)
-	err := c.cc.Invoke(ctx, CoordinatorService_CreateSession_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *coordinatorServiceClient) DestroySession(ctx context.Context, in *DestroySessionRequest, opts ...grpc.CallOption) (*DestroySessionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DestroySessionResponse)
-	err := c.cc.Invoke(ctx, CoordinatorService_DestroySession_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *coordinatorServiceClient) InitializeTask(ctx context.Context, in *InitTaskRequest, opts ...grpc.CallOption) (*InitTaskResponse, error) {
@@ -103,59 +71,13 @@ func (c *coordinatorServiceClient) GetCoordinatorHealth(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *coordinatorServiceClient) RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RegisterWorkerResponse)
-	err := c.cc.Invoke(ctx, CoordinatorService_RegisterWorker_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *coordinatorServiceClient) UnregisterWorker(ctx context.Context, in *UnregisterWorkerRequest, opts ...grpc.CallOption) (*UnregisterWorkerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UnregisterWorkerResponse)
-	err := c.cc.Invoke(ctx, CoordinatorService_UnregisterWorker_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *coordinatorServiceClient) GetWorker(ctx context.Context, in *GetWorkerRequest, opts ...grpc.CallOption) (*GetWorkerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetWorkerResponse)
-	err := c.cc.Invoke(ctx, CoordinatorService_GetWorker_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *coordinatorServiceClient) ListWorkers(ctx context.Context, in *ListWorkersRequest, opts ...grpc.CallOption) (*ListWorkersResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListWorkersResponse)
-	err := c.cc.Invoke(ctx, CoordinatorService_ListWorkers_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // CoordinatorServiceServer is the server API for CoordinatorService service.
 // All implementations must embed UnimplementedCoordinatorServiceServer
 // for forward compatibility.
 type CoordinatorServiceServer interface {
-	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
-	DestroySession(context.Context, *DestroySessionRequest) (*DestroySessionResponse, error)
 	InitializeTask(context.Context, *InitTaskRequest) (*InitTaskResponse, error)
 	RelayForward(context.Context, *RelayRequest) (*RelayResponse, error)
 	GetCoordinatorHealth(context.Context, *GetCoordinatorHealthRequest) (*CoordinatorHealthResponse, error)
-	RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error)
-	UnregisterWorker(context.Context, *UnregisterWorkerRequest) (*UnregisterWorkerResponse, error)
-	GetWorker(context.Context, *GetWorkerRequest) (*GetWorkerResponse, error)
-	ListWorkers(context.Context, *ListWorkersRequest) (*ListWorkersResponse, error)
 	mustEmbedUnimplementedCoordinatorServiceServer()
 }
 
@@ -166,12 +88,6 @@ type CoordinatorServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCoordinatorServiceServer struct{}
 
-func (UnimplementedCoordinatorServiceServer) CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateSession not implemented")
-}
-func (UnimplementedCoordinatorServiceServer) DestroySession(context.Context, *DestroySessionRequest) (*DestroySessionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DestroySession not implemented")
-}
 func (UnimplementedCoordinatorServiceServer) InitializeTask(context.Context, *InitTaskRequest) (*InitTaskResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method InitializeTask not implemented")
 }
@@ -180,18 +96,6 @@ func (UnimplementedCoordinatorServiceServer) RelayForward(context.Context, *Rela
 }
 func (UnimplementedCoordinatorServiceServer) GetCoordinatorHealth(context.Context, *GetCoordinatorHealthRequest) (*CoordinatorHealthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCoordinatorHealth not implemented")
-}
-func (UnimplementedCoordinatorServiceServer) RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RegisterWorker not implemented")
-}
-func (UnimplementedCoordinatorServiceServer) UnregisterWorker(context.Context, *UnregisterWorkerRequest) (*UnregisterWorkerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UnregisterWorker not implemented")
-}
-func (UnimplementedCoordinatorServiceServer) GetWorker(context.Context, *GetWorkerRequest) (*GetWorkerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetWorker not implemented")
-}
-func (UnimplementedCoordinatorServiceServer) ListWorkers(context.Context, *ListWorkersRequest) (*ListWorkersResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListWorkers not implemented")
 }
 func (UnimplementedCoordinatorServiceServer) mustEmbedUnimplementedCoordinatorServiceServer() {}
 func (UnimplementedCoordinatorServiceServer) testEmbeddedByValue()                            {}
@@ -212,42 +116,6 @@ func RegisterCoordinatorServiceServer(s grpc.ServiceRegistrar, srv CoordinatorSe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CoordinatorService_ServiceDesc, srv)
-}
-
-func _CoordinatorService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateSessionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoordinatorServiceServer).CreateSession(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoordinatorService_CreateSession_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoordinatorServiceServer).CreateSession(ctx, req.(*CreateSessionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CoordinatorService_DestroySession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DestroySessionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoordinatorServiceServer).DestroySession(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoordinatorService_DestroySession_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoordinatorServiceServer).DestroySession(ctx, req.(*DestroySessionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _CoordinatorService_InitializeTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -304,78 +172,6 @@ func _CoordinatorService_GetCoordinatorHealth_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CoordinatorService_RegisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterWorkerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoordinatorServiceServer).RegisterWorker(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoordinatorService_RegisterWorker_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoordinatorServiceServer).RegisterWorker(ctx, req.(*RegisterWorkerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CoordinatorService_UnregisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UnregisterWorkerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoordinatorServiceServer).UnregisterWorker(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoordinatorService_UnregisterWorker_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoordinatorServiceServer).UnregisterWorker(ctx, req.(*UnregisterWorkerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CoordinatorService_GetWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetWorkerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoordinatorServiceServer).GetWorker(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoordinatorService_GetWorker_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoordinatorServiceServer).GetWorker(ctx, req.(*GetWorkerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CoordinatorService_ListWorkers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListWorkersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoordinatorServiceServer).ListWorkers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoordinatorService_ListWorkers_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoordinatorServiceServer).ListWorkers(ctx, req.(*ListWorkersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // CoordinatorService_ServiceDesc is the grpc.ServiceDesc for CoordinatorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -383,14 +179,6 @@ var CoordinatorService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "openswarm.api.CoordinatorService",
 	HandlerType: (*CoordinatorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "CreateSession",
-			Handler:    _CoordinatorService_CreateSession_Handler,
-		},
-		{
-			MethodName: "DestroySession",
-			Handler:    _CoordinatorService_DestroySession_Handler,
-		},
 		{
 			MethodName: "InitializeTask",
 			Handler:    _CoordinatorService_InitializeTask_Handler,
@@ -402,22 +190,6 @@ var CoordinatorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCoordinatorHealth",
 			Handler:    _CoordinatorService_GetCoordinatorHealth_Handler,
-		},
-		{
-			MethodName: "RegisterWorker",
-			Handler:    _CoordinatorService_RegisterWorker_Handler,
-		},
-		{
-			MethodName: "UnregisterWorker",
-			Handler:    _CoordinatorService_UnregisterWorker_Handler,
-		},
-		{
-			MethodName: "GetWorker",
-			Handler:    _CoordinatorService_GetWorker_Handler,
-		},
-		{
-			MethodName: "ListWorkers",
-			Handler:    _CoordinatorService_ListWorkers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

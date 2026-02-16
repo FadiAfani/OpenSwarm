@@ -19,6 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	WorkerService_RegisterWorker_FullMethodName       = "/openswarm.api.WorkerService/RegisterWorker"
+	WorkerService_UnregisterWorker_FullMethodName     = "/openswarm.api.WorkerService/UnregisterWorker"
+	WorkerService_GetWorker_FullMethodName            = "/openswarm.api.WorkerService/GetWorker"
+	WorkerService_ListWorkers_FullMethodName          = "/openswarm.api.WorkerService/ListWorkers"
 	WorkerService_Heartbeat_FullMethodName            = "/openswarm.api.WorkerService/Heartbeat"
 	WorkerService_ConnectToCoordinator_FullMethodName = "/openswarm.api.WorkerService/ConnectToCoordinator"
 )
@@ -30,6 +34,10 @@ const (
 // WorkerService handles worker-related operations. A worker is a decentralized
 // node in the network that holds sharded layers of an LLM and some experts.
 type WorkerServiceClient interface {
+	RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error)
+	UnregisterWorker(ctx context.Context, in *UnregisterWorkerRequest, opts ...grpc.CallOption) (*UnregisterWorkerResponse, error)
+	GetWorker(ctx context.Context, in *GetWorkerRequest, opts ...grpc.CallOption) (*GetWorkerResponse, error)
+	ListWorkers(ctx context.Context, in *ListWorkersRequest, opts ...grpc.CallOption) (*ListWorkersResponse, error)
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 	ConnectToCoordinator(ctx context.Context, in *ConnectToCoordinatorRequest, opts ...grpc.CallOption) (*ConnectToCoordinatorResponse, error)
 }
@@ -40,6 +48,46 @@ type workerServiceClient struct {
 
 func NewWorkerServiceClient(cc grpc.ClientConnInterface) WorkerServiceClient {
 	return &workerServiceClient{cc}
+}
+
+func (c *workerServiceClient) RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterWorkerResponse)
+	err := c.cc.Invoke(ctx, WorkerService_RegisterWorker_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workerServiceClient) UnregisterWorker(ctx context.Context, in *UnregisterWorkerRequest, opts ...grpc.CallOption) (*UnregisterWorkerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UnregisterWorkerResponse)
+	err := c.cc.Invoke(ctx, WorkerService_UnregisterWorker_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workerServiceClient) GetWorker(ctx context.Context, in *GetWorkerRequest, opts ...grpc.CallOption) (*GetWorkerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWorkerResponse)
+	err := c.cc.Invoke(ctx, WorkerService_GetWorker_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workerServiceClient) ListWorkers(ctx context.Context, in *ListWorkersRequest, opts ...grpc.CallOption) (*ListWorkersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListWorkersResponse)
+	err := c.cc.Invoke(ctx, WorkerService_ListWorkers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *workerServiceClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error) {
@@ -69,6 +117,10 @@ func (c *workerServiceClient) ConnectToCoordinator(ctx context.Context, in *Conn
 // WorkerService handles worker-related operations. A worker is a decentralized
 // node in the network that holds sharded layers of an LLM and some experts.
 type WorkerServiceServer interface {
+	RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error)
+	UnregisterWorker(context.Context, *UnregisterWorkerRequest) (*UnregisterWorkerResponse, error)
+	GetWorker(context.Context, *GetWorkerRequest) (*GetWorkerResponse, error)
+	ListWorkers(context.Context, *ListWorkersRequest) (*ListWorkersResponse, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	ConnectToCoordinator(context.Context, *ConnectToCoordinatorRequest) (*ConnectToCoordinatorResponse, error)
 	mustEmbedUnimplementedWorkerServiceServer()
@@ -81,6 +133,18 @@ type WorkerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedWorkerServiceServer struct{}
 
+func (UnimplementedWorkerServiceServer) RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterWorker not implemented")
+}
+func (UnimplementedWorkerServiceServer) UnregisterWorker(context.Context, *UnregisterWorkerRequest) (*UnregisterWorkerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UnregisterWorker not implemented")
+}
+func (UnimplementedWorkerServiceServer) GetWorker(context.Context, *GetWorkerRequest) (*GetWorkerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWorker not implemented")
+}
+func (UnimplementedWorkerServiceServer) ListWorkers(context.Context, *ListWorkersRequest) (*ListWorkersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWorkers not implemented")
+}
 func (UnimplementedWorkerServiceServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Heartbeat not implemented")
 }
@@ -106,6 +170,78 @@ func RegisterWorkerServiceServer(s grpc.ServiceRegistrar, srv WorkerServiceServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&WorkerService_ServiceDesc, srv)
+}
+
+func _WorkerService_RegisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterWorkerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).RegisterWorker(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_RegisterWorker_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).RegisterWorker(ctx, req.(*RegisterWorkerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkerService_UnregisterWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnregisterWorkerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).UnregisterWorker(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_UnregisterWorker_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).UnregisterWorker(ctx, req.(*UnregisterWorkerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkerService_GetWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).GetWorker(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_GetWorker_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).GetWorker(ctx, req.(*GetWorkerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkerService_ListWorkers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListWorkersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).ListWorkers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_ListWorkers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).ListWorkers(ctx, req.(*ListWorkersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _WorkerService_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -151,6 +287,22 @@ var WorkerService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "openswarm.api.WorkerService",
 	HandlerType: (*WorkerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "RegisterWorker",
+			Handler:    _WorkerService_RegisterWorker_Handler,
+		},
+		{
+			MethodName: "UnregisterWorker",
+			Handler:    _WorkerService_UnregisterWorker_Handler,
+		},
+		{
+			MethodName: "GetWorker",
+			Handler:    _WorkerService_GetWorker_Handler,
+		},
+		{
+			MethodName: "ListWorkers",
+			Handler:    _WorkerService_ListWorkers_Handler,
+		},
 		{
 			MethodName: "Heartbeat",
 			Handler:    _WorkerService_Heartbeat_Handler,

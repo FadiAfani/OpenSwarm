@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package openswarm.api;
+
+option go_package = "openswarm/api/gen";
+
+import "api/proto/coordinator.proto";
+
+service SessionService {
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+  rpc DestroySession(DestroySessionRequest) returns (DestroySessionResponse);
+  rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
+}
+
+message CreateSessionRequest {
+  string consumer_id = 1;
+  string model_id = 2;
+  Pipeline pipeline = 3;
+}
+
+message CreateSessionResponse {
+  string session_id = 1;
+}
+
+message DestroySessionRequest {
+  string session_id = 1;
+}
+
+message DestroySessionResponse {
+  bool destroyed = 1;
+}
+
+message GetSessionRequest {
+  string session_id = 1;
+}
+
+message GetSessionResponse {
+  bool found = 1;
+  string session_id = 2;
+  string consumer_id = 3;
+  string model_id = 4;
+  Pipeline pipeline = 5;
+}

@@ -6,6 +6,8 @@ import (
 	"net"
 	pb "openswarm/api/gen"
 	co "openswarm/internal/coordinator"
+	se "openswarm/internal/session"
+	wk "openswarm/internal/worker/agent"
 
 	"google.golang.org/grpc"
 )
@@ -21,6 +23,14 @@ func main() {
 	pb.RegisterCoordinatorServiceServer(
 		grpc_server,
 		co.NewCoordinatorGRPCServer(),
+	)
+	pb.RegisterWorkerServiceServer(
+		grpc_server,
+		wk.NewGRPCServer(),
+	)
+	pb.RegisterSessionServiceServer(
+		grpc_server,
+		se.NewGRPCServer(),
 	)
 
 	grpc_server.Serve(lis)

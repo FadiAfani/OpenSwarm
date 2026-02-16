@@ -59,7 +59,7 @@ func runWorkerRegister(args []string) error {
 	}
 	defer conn.Close()
 
-	client := pb.NewCoordinatorServiceClient(conn)
+	client := pb.NewWorkerServiceClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()

@@ -4,41 +4,16 @@ package openswarm.api;
 
 option go_package = "openswarm/api/gen";
 
-
 import "api/proto/types.proto";
 
 service CoordinatorService {
-    rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
-    rpc DestroySession(DestroySessionRequest) returns (DestroySessionResponse);
     rpc InitializeTask(InitTaskRequest) returns (InitTaskResponse);
     rpc RelayForward(RelayRequest) returns (RelayResponse);
     rpc GetCoordinatorHealth(GetCoordinatorHealthRequest) returns (CoordinatorHealthResponse);
-    rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
-    rpc UnregisterWorker(UnregisterWorkerRequest) returns (UnregisterWorkerResponse);
-    rpc GetWorker(GetWorkerRequest) returns (GetWorkerResponse);
-    rpc ListWorkers(ListWorkersRequest) returns (ListWorkersResponse);
 }
 
 message Pipeline {
     repeated string worker_ids = 1;
-}
-
-message CreateSessionRequest {
-    string consumer_id = 1;
-    string model_id = 2;
-    Pipeline pipeline = 3;
-}
-
-message CreateSessionResponse {
-    string session_id = 1;
-}
-
-message DestroySessionRequest {
-    string session_id = 1;
-}
-
-message DestroySessionResponse {
-    bool destroyed = 1;
 }
 
 message InitTaskRequest {
@@ -64,41 +39,4 @@ message GetCoordinatorHealthRequest {}
 message CoordinatorHealthResponse {
     bool status = 1;
     string latency = 2;
-}
-
-message RegisterWorkerRequest {
-  string worker_id = 1;
-  string gpu_model = 2;
-  int32 vram = 3;
-  string coordinator_id = 4;
-}
-
-message RegisterWorkerResponse {
-  bool accepted = 1;
-}
-
-message UnregisterWorkerRequest {
-  string worker_id = 1;
-}
-
-message UnregisterWorkerResponse {}
-
-message GetWorkerRequest {
-  string worker_id = 1;
-}
-
-message GetWorkerResponse {
-  bool found = 1;
-  string worker_id = 2;
-  string gpu_model = 3;
-  int32 vram = 4;
-  string coordinator_id = 5;
-}
-
-message ListWorkersRequest {
-  bool online_only = 1;
-}
-
-message ListWorkersResponse {
-  repeated Worker workers = 1;
 }
