@@ -10,15 +10,7 @@ func ValidateRegisterWorkerRequest(req *api.RegisterWorkerRequest) error {
 	if req.WorkerId == "" {
 		return errors.New("worker_id is required")
 	}
-	if req.GpuModel == "" {
-		return errors.New("gpu_model is required")
-	}
-	if req.Vram == 0 {
-		return errors.New("vram is required")
-	}
-	if req.CoordinatorId == "" {
-		return errors.New("coordinator_id is required")
-	}
+	// gpu_model, vram, and coordinator_id are optional
 	return nil
 }
 

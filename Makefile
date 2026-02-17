@@ -1,7 +1,10 @@
-.PHONY: deps proto gen build run coordinator
+.PHONY: deps proto gen build run coordinator cli
 
 COORDINATOR_CMD := ./cmd/coordinator
 COORDINATOR_BIN := ./bin/coordinator
+CLI_CMD := ./cli
+CLI_BIN := ./bin/openswarm-cli
+CLI_ROOT_BIN := ./openswarm-cli
 
 # Install protoc Go plugins (ensure $GOPATH/bin or $GOBIN is in PATH)
 deps:
@@ -19,6 +22,11 @@ build: coordinator
 
 coordinator:
 	go build -o $(COORDINATOR_BIN) $(COORDINATOR_CMD)
+
+# Build the CLI binary.
+cli:
+	go build -o $(CLI_BIN) $(CLI_CMD)
+	cp $(CLI_BIN) $(CLI_ROOT_BIN)
 
 # Run the coordinator service directly.
 run:

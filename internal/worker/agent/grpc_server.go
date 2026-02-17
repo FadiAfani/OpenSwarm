@@ -39,8 +39,13 @@ func (s *GRPCServer) RegisterWorker(ctx context.Context, req *api.RegisterWorker
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "missing request")
 	}
-	if err := ValidateRegisterWorkerRequest(req); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+	if req.WorkerId == "" {
+		return nil, status.Error(codes.InvalidArgument, "worker_id is required")
+	}
+	// gpu_model and vram are optional; use defaults when empty/zero
+	gpuModel := req.GpuModel
+	if gpuModel == "" {
+		gpuModel = "unspecified"
 	}
 
 	id := models.NewUUID()
@@ -48,7 +53,7 @@ func (s *GRPCServer) RegisterWorker(ctx context.Context, req *api.RegisterWorker
 	s.mu.Lock()
 	worker := Record{
 		ID:       id,
-		GpuModel: req.GpuModel,
+		GpuModel: gpuModel,
 		Vram:     uint(req.Vram),
 		Status:   Status{},
 	}
